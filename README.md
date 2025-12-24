@@ -1,86 +1,91 @@
-🏏 Cricket Ball Tracking using YOLOv8
+# 🏏 Cricket Ball Tracking using YOLOv8
 
 This project implements automatic cricket ball detection and tracking from a video using a fine-tuned YOLOv8 model.
 The system generates:
 
-🎥 An annotated output video with ball centroid and trajectory overlaid
-📄 A CSV file containing per-frame ball coordinates and visibility
+- 🎥 An annotated output video with ball centroid and trajectory overlaid  
+- 📄 A CSV file containing per-frame ball coordinates and visibility  
 
-📁 Project Structure
+---
 
+## 📁 Project Structure
+
+```text
 edgefleet_ball_tracking/
 │
 ├── code/                                # Core source code
 │   ├── inference.py                    # Runs detection + tracking on input video
 │   ├── tracker.py                      # Ball tracking logic (Kalman / smoothing)
 │   ├── utils.py                        # Helper utilities
-│   └── train.py                        # YOLO training script 
+│   └── train.py                        # YOLO training script
 │
-├── data/                                # Raw videos used in project
+├── data/                               # Raw videos used in project
 │   ├── train/                          # Training videos
 │   └── test/                           # Test videos for inference
 │
-├── dataset/                             # YOLO-format dataset (from Roboflow)
+├── dataset/                            # YOLO-format dataset (from Roboflow)
 │
-├── ball_training/                       # YOLO training experiment outputs                  
+├── ball_training/                      # YOLO training experiment outputs
 │
-├── models/                              
+├── models/
 │   └── yolov8_ball.pt                  # Final trained ball detection model
 │
-├── examples/                           # Sample annotated frames showing ball centroid 
-│   └──*.png                             # and trajectory overlay    
+├── examples/                           # Sample annotated frames
+│   └── *.png                           # Ball centroid & trajectory overlay
 │
-├── annotations/                         # Output CSV files (ball position per frame)
-│   └── *.csv                            
+├── annotations/                        # Output CSV files (ball position per frame)
+│   └── *.csv
 │
-├── results/                             
+├── results/
 │   └── *.mp4                           # Processed videos with centroid & trajectory
 │
-├── README.md                            
-├── report.pdf                          
-└── requirements.txt                    
-
-
-⚙️ Environment Setup
-1️⃣ Create virtual environment (recommended)
+├── README.md
+├── report.pdf
+└── requirements.txt
+```
+---
+## ⚙️ Environment Setup
+### 1️⃣ Create virtual environment (recommended)
+```bash
 python -m venv venv
 venv\Scripts\activate   # Windows
+```
 
-2️⃣ Install dependencies
+### 2️⃣ Install dependencies
+```bash
 pip install -r requirements.txt
-
+```
 ⚠️ Note
-If CUDA is not available, install CPU-only PyTorch:
+- If CUDA is not available, install CPU-only PyTorch:
+```bash
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
-
-🧠 Model Details
-Architecture: YOLOv8
-Framework: Ultralytics
-Classes: ball
-Input Size: 1280 × 1280
-Output: Bounding box → centroid → trajectory
+```
 
 The model is fine-tuned specifically for small object (cricket ball) detection.
 
-▶️ Inference
+---
+## ▶️ Inference
 Run inference using:
+```bash
 python code/inference.py --video data/test/9.mov --out_video results/9.mp4 --out_csv annotations/9.csv
-
-📤 Outputs Explained
+```
+### 📤 Outputs Explained
 
 🎥 Output Video
 Original video with:
-🔴 Red dot → Ball centroid
-🔵 Blue polyline → Ball trajectory (last N frames)
+- 🔴 Red dot → Ball centroid
+- 🔵 Blue polyline → Ball trajectory (last N frames)
 
 📄 Output CSV Format
+```text
 Column	Description
 frame	Frame index (0-based)
 x	X-coordinate of ball centroid
 y	Y-coordinate of ball centroid
 visible	1 if ball detected, else 0
-
+```
 Example:
+```text
 frame,x,y,visible
 0,642,381,1
 1,650,389,1
@@ -88,29 +93,48 @@ frame,x,y,visible
 
 visible = 0 → Ball not detected in that frame
 Coordinates set to -1 when invisible 
-
-🔄 Tracking Logic
+```
+### 🔄 Tracking Logic
 The tracking pipeline works as follows:
-YOLO detects the ball in each frame
-Highest-confidence detection is selected
-Centroid is computed from bounding box
-A trajectory buffer (deque) stores recent centroids
-Tracker smooths motion and handles brief missed detections
-Trajectory is drawn frame-by-frame
-If the ball is temporarily missed, the tracker maintains continuity using recent motion history.
-When multiple detections are present in a frame, the detection with the highest confidence score is selected as the true ball candidate.
+- YOLO detects the ball in each frame
+- Highest-confidence detection is selected
+- Centroid is computed from bounding box
+- A trajectory buffer (deque) stores recent centroids
+- Tracker smooths motion and handles brief missed detections
+- Trajectory is drawn frame-by-frame
+- If the ball is temporarily missed, the tracker maintains continuity using recent motion history.
+- When multiple detections are present in a frame, the detection with the highest confidence score is selected as the true ball candidate.
 
 This ensures:
-Reduced flickering
-Smooth trajectory
-Robust tracking across occlusions
+- Reduced flickering
+- Smooth trajectory
+- Robust tracking across occlusions
 
-📦 Model File
+---
+### 📦 Model File
+
 The trained YOLOv8 ball detection model is provided at:
+```text
 models/yolov8_ball.pt
+```
 This model can be directly used for inference without retraining.
 
-📄 Detailed Report
+### 🧠 Model Details
+
+- Base model: YOLOv8n
+- Input size: 640 × 640
+- Epochs: 50
+- Batch size: 1
+- Framework: Ultralytics YOLO
+
+### 🧪 Test Environment (Minimum)
+
+- GPU: NVIDIA GeForce MX450 (2GB)
+- OS: Windows 11
+- Python: 3.12
+- CUDA: 12.1
+
+### 📄 Detailed Report
 A detailed report (`report.pdf`) is included, covering:
 - Model training decisions
 - Hyperparameter choices
@@ -118,11 +142,6 @@ A detailed report (`report.pdf`) is included, covering:
 - Performance improvements and limitations
 - Example qualitative results
 
-🧪 Tested On
-GPU: NVIDIA GeForce MX450 (2GB)
-OS: Windows 11
-Python: 3.12
-CUDA: 12.1
 
-👤 Author
+### 👤 Author
 Himanshu Kumar
