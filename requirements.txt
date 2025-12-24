@@ -1,0 +1,14 @@
+# Python 3.10+ recommended
+# CUDA 12.1 compatible
+
+ultralytics==8.3.240
+torch==2.5.1+cu121
+torchvision==0.20.1+cu121
+torchaudio==2.5.1+cu121
+
+opencv-python==4.10.0.84
+numpy==1.26.4
+
+pandas==2.2.2
+tqdm==4.66.5
+pyyaml==6.0.2
